@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import * as XLSX from 'xlsx';
 
 // Modern Icon Components
 const Icons = {
@@ -249,32 +250,26 @@ const [isDeleting, setIsDeleting] = useState(false);
     }
   };
 
-  const exportToExcel = async () => {
-    try {
-      setExporting(true);
+ const exportToExcel = async () => {
+  try {
+    setExporting(true);
 
-      const response = await fetch("/api/feedback/export");
+    const data = feedback;
 
-      if (!response.ok) {
-        throw new Error("Failed to export data");
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `feedback-export-${
-        new Date().toISOString().split("T")[0]
-      }.xlsx`;
-      link.click();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("Error exporting data:", err);
-      setError("Failed to export data");
-    } finally {
-      setExporting(false);
-    }
-  };
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Feedback Data");
+    
+    // Use writeFile instead of write with buffer
+    XLSX.writeFile(workbook, `feedback-export-${new Date().toISOString().split('T')[0]}.xlsx`);
+    
+  } catch (err) {
+    console.error("Error exporting data:", err);
+    setError("Failed to export data");
+  } finally {
+    setExporting(false);
+  }
+};
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString();

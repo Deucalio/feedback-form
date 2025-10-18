@@ -1,5 +1,5 @@
 import { connectToDatabase } from "@/lib/mongodb";
-import { validateEmail } from "@/lib/utils";
+import { getClientIP, validateEmail } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 export async function POST(request) {
   try {
@@ -30,10 +30,7 @@ export async function POST(request) {
       return Response.json({ error: "Invalid topic" }, { status: 400 });
     }
 
-    const ipAddress =
-      request.headers.get("x-forwarded-for") ||
-      request.headers.get("x-client-ip") ||
-      "unknown";
+    const ipAddress =getClientIP(request)
 
     const feedbackData = {
       name: name.trim(),

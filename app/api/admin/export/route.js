@@ -1,8 +1,6 @@
 import { connectToDatabase } from "@/lib/mongodb";
-// import XLSX from 'xlsx';
 
 export async function GET(request) {
-  return new Response("Hello, Next.js!");
   try {
     const { db } = await connectToDatabase();
 
