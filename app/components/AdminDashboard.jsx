@@ -207,7 +207,7 @@ const AdminDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [feedbackToDelete, setFeedbackToDelete] = useState(null);
-
+const [isDeleting, setIsDeleting] = useState(false);
   useEffect(() => {
     fetchFeedback();
     fetchStats();
@@ -297,7 +297,7 @@ const AdminDashboard = () => {
 
       // Generate QR code for the specific feedback form URL
       const feedbackFormUrl =
-        "https://sapeventfeedbackform.online.tgtdemo.com/feedback";
+        "https://saphrsesummit.online";
 
       const response = await fetch("/api/qrcode", {
         method: "POST",
@@ -389,7 +389,7 @@ const AdminDashboard = () => {
             <div class="qr-title">Feedback Form</div>
             <div class="qr-subtitle">Scan to access the feedback form</div>
             <img src="${qrCode}" alt="QR Code" class="qr-image" />
-            <div class="qr-url">https://sapeventfeedbackform.online.tgtdemo.com/feedback</div>
+            <div class="qr-url">https://saphrsesummit.online</div>
           </div>
         </body>
       </html>
@@ -407,8 +407,9 @@ const AdminDashboard = () => {
     if (!feedbackToDelete) return;
 
     try {
+      setIsDeleting(true)
       const response = await fetch(
-        `/api/feedback/${feedbackToDelete}`,
+        `/api/feedback?id=${feedbackToDelete}`,
         {
           method: "DELETE",
         }
@@ -434,6 +435,8 @@ const AdminDashboard = () => {
       setError("Failed to delete feedback. Please try again.");
       setShowDeleteModal(false);
       setFeedbackToDelete(null);
+    } finally {
+      setIsDeleting(false)
     }
   };
 
@@ -511,7 +514,7 @@ const AdminDashboard = () => {
                 />
                 <div className="qr-url">
                   <strong>URL:</strong>{" "}
-                  https://sapeventfeedbackform.online.tgtdemo.com/feedback
+                  https://saphrsesummit.online
                 </div>
               </>
             ) : (
@@ -854,7 +857,7 @@ const AdminDashboard = () => {
               <button className="modal-btn secondary" onClick={cancelDelete}>
                 Cancel
               </button>
-              <button className="modal-btn danger" onClick={confirmDelete}>
+              <button disabled={isDeleting} className={`modal-btn danger ${isDeleting ? "opacity-45 pointer-events-none" : ""}`} onClick={confirmDelete}>
                 Delete
               </button>
             </div>
